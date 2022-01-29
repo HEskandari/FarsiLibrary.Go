@@ -111,7 +111,7 @@ func (c *PersianDateConverter) ToPersianDate(time time.Time) PersianDate {
 	iTotalDays = iTotalDays - GYearOff
 
 	//Calculate total jalali years passed
-	var jyear = iTotalDays / int(math.Floor(Solar-0.25/33.0))
+	var jyear = int(float64(iTotalDays) / (Solar-0.25/33.0))
 
 	//Calculate passed leap years
 	var leap = c.JLeapYears(jyear)
