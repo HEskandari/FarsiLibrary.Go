@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 )
 
 const (
-	GenericFormat     = "yyyy/mm/dd"
-	MonthDayFormat    = "MMMM dd"
-	MonthYearFormat   = "MMMM, yyyy"
-	WrittenFormat     = "W"
+	GenericFormat      = "yyyy/mm/dd"
+	GenericShortFormat = "yyyy/m/d"
+	MonthDayFormat     = "MMMM dd"
+	MonthYearFormat    = "MMMM, yyyy"
+	WrittenFormat      = "W"
 )
 
 type PersianDate struct {
@@ -22,9 +22,9 @@ type PersianDate struct {
 
 type parseResult struct {
 	error error
-	year int
+	year  int
 	month int
-	day int
+	day   int
 }
 
 func (pd *PersianDate) Year() int {
@@ -68,8 +68,28 @@ func Parse(value string) (*PersianDate, error) {
 	return NewPersianDate(parseResult.year, parseResult.month, parseResult.day)
 }
 
-func (pd *PersianDate) Format(layout string) string
+func (pd *PersianDate) Format(layout string) string {
+	generic := func(pd PersianDate) string {
+		return fmt.Sprintf("%s/%s/%s",
+			LocalizeDigits(pd.Year()),
+			LocalizeDigits(fmt.Sprintf("%02d", pd.Month())),
+			LocalizeDigits(fmt.Sprintf("%02d", pd.Day())))
+	}
 
+	switch layout {
+	case WrittenFormat:
+		return fmt.Sprintf("%s %s %s %s", pd.DayOfWeek(), LocalizeDigits(pd.Day()), pd.MonthName(), LocalizeDigits(pd.Year()))
+	case MonthYearFormat:
+		return fmt.Sprintf("%s %s", pd.MonthName(), LocalizeDigits(pd.Year()))
+	case MonthDayFormat:
+		return fmt.Sprintf("%s %s", LocalizeDigits(pd.Day()), pd.MonthName())
+	case GenericShortFormat:
+		return fmt.Sprintf("%s/%s/%s", LocalizeDigits(pd.Year()), LocalizeDigits(pd.Month()), LocalizeDigits(pd.Day()))
+	case GenericFormat:
+		return generic(*pd)
+	}
+
+	return generic(*pd)
 }
 
 func parse(value string) parseResult {
@@ -118,7 +138,11 @@ func parse(value string) parseResult {
 
 func (pd *PersianDate) DayOfWeek() string {
 	var dt = ToGregorianDate(pd)
-	return DayOfWeek(dt)
+	return LocalizeDayOfWeek(dt)
+}
+
+func (pd *PersianDate) MonthName() string {
+	return monthNames[pd.month-1]
 }
 
 func checkYear(year int) error {

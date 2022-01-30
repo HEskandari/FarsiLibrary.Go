@@ -17,6 +17,18 @@ func TestPersianDate_ParseString(t *testing.T) {
 	}
 }
 
+func TestPersianDate_Format(t *testing.T) {
+	pd, _ := FarsiLibrary.NewPersianDate(1388, 2, 3)
+	if assert.NotNil(t, pd) {
+		assert.Equal(t, "۱۳۸۸/۰۲/۰۳", pd.Format(FarsiLibrary.GenericFormat))
+		assert.Equal(t, "اردیبهشت ۱۳۸۸", pd.Format(FarsiLibrary.MonthYearFormat))
+		assert.Equal(t, "۳ اردیبهشت", pd.Format(FarsiLibrary.MonthDayFormat))
+		assert.Equal(t, "۱۳۸۸/۲/۳", pd.Format(FarsiLibrary.GenericShortFormat))
+		assert.Equal(t, "پنجشنبه ۳ اردیبهشت ۱۳۸۸", pd.Format(FarsiLibrary.WrittenFormat))
+		assert.Equal(t, "۱۳۸۸/۰۲/۰۳", pd.Format(""))
+	}
+}
+
 func TestPersianDate_NumberOfMonths(t *testing.T) {
 
 	// Converts to a leap year in Persian Date (29th Mehr 1387)
@@ -43,7 +55,7 @@ func TestPersianDate_GetDayOfWeek(t *testing.T) {
 
 func TestPersianDate_GetDayOfWeekFromWeekday(t *testing.T) {
 	pd := time.Date(2008, 10, 21, 0, 0, 0, 0, time.Local) // October 30th, Tuesday
-	wd := FarsiLibrary.DayOfWeek(pd)
+	wd := FarsiLibrary.LocalizeDayOfWeek(pd)
 
 	if assert.NotNil(t, wd) {
 		assert.NotEmpty(t, wd)

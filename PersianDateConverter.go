@@ -7,14 +7,26 @@ import (
 
 const (
 	yearOffset = 226894
-	solar = 365.25
+	solar      = 365.25
 )
 
-var weekdays = []string{"شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه"}
-var weekdaysabbr = []string{"ش", "ی", "د", "س", "چ", "پ", "ج"}
 var gdayTable = [12][12]int{{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}, {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}}
 var jdayTable = [12][12]int{{31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29}, {31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 30}}
-
+var weekdays = []string{"شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه"}
+var weekdaysabbr = []string{"ش", "ی", "د", "س", "چ", "پ", "ج"}
+var monthNames = []string{"فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"}
+var digits = map[rune]rune{
+	'0': '۰',
+	'1': '۱',
+	'2': '۲',
+	'3': '۳',
+	'4': '۴',
+	'5': '۵',
+	'6': '۶',
+	'7': '۷',
+	'8': '۸',
+	'9': '۹',
+}
 
 // ToPersianDate converts a time.Time to Persian Date.
 func ToPersianDate(time time.Time) PersianDate {
@@ -26,7 +38,7 @@ func ToPersianDate(time time.Time) PersianDate {
 	iTotalDays -= yearOffset
 
 	// Calculate total jalali years passed
-	var jyear = int(float64(iTotalDays) / (solar -0.25/33.0))
+	var jyear = int(float64(iTotalDays) / (solar - 0.25/33.0))
 
 	// Calculate passed leap years
 	var leap = JLeapYears(jyear)

@@ -1,6 +1,10 @@
 package FarsiLibrary
 
-import "time"
+import (
+	"strconv"
+	"strings"
+	"time"
+)
 
 // JLeap returns one if the specified Persian year is a leap one, otherwise returns zero.
 func JLeap(jyear int) int {
@@ -94,7 +98,30 @@ func GregDays(gYear int, gMonth int, gDay int) int {
 	return ((gYear - 1) * 365) + gDay + div4 - div100 + div400
 }
 
-func DayOfWeek(t time.Time) string {
+func LocalizeDigits(v interface{}) string {
+
+	tostring := func() string {
+		switch t := v.(type) {
+		case int:
+			return strconv.Itoa(t)
+		case string:
+			return t
+		default:
+			return ""
+		}
+	}
+
+	s := tostring()
+	sb := strings.Builder{}
+	for _, r := range s {
+		if d, ok := digits[r]; ok {
+			sb.WriteRune(d)
+		}
+	}
+	return sb.String()
+}
+
+func LocalizeDayOfWeek(t time.Time) string {
 	weekday := t.Weekday()
 	switch weekday {
 	case time.Saturday:
