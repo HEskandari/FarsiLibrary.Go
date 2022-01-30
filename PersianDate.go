@@ -2,12 +2,29 @@ package FarsiLibrary
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
+)
+
+const (
+	GenericFormat     = "yyyy/mm/dd"
+	MonthDayFormat    = "MMMM dd"
+	MonthYearFormat   = "MMMM, yyyy"
+	WrittenFormat     = "W"
 )
 
 type PersianDate struct {
 	year  int
 	month int
 	day   int
+}
+
+type parseResult struct {
+	error error
+	year int
+	month int
+	day int
 }
 
 func (pd *PersianDate) Year() int {
@@ -40,6 +57,63 @@ func NewPersianDate(year int, month int, day int) (*PersianDate, error) {
 	}
 
 	return &PersianDate{year, month, day}, nil
+}
+
+func Parse(value string) (*PersianDate, error) {
+	parseResult := parse(value)
+	if parseResult.error != nil {
+		return nil, parseResult.error
+	}
+
+	return NewPersianDate(parseResult.year, parseResult.month, parseResult.day)
+}
+
+func (pd *PersianDate) Format(layout string) string
+
+}
+
+func parse(value string) parseResult {
+	if len(value) == 0 || len(value) > 10 {
+		return parseResult{error: fmt.Errorf("invalid date string")}
+	}
+
+	parts := strings.Split(value, "/")
+	if len(parts) != 3 {
+		return parseResult{error: fmt.Errorf("invalid date string")}
+	}
+
+	partYear := parts[0]
+	partMonth := parts[1]
+	partDay := parts[2]
+
+	if len(partYear) != 4 {
+		return parseResult{error: fmt.Errorf("invalid year in the value string: %s", partYear)}
+	}
+
+	if len(partMonth) == 0 || len(partMonth) > 2 {
+		return parseResult{error: fmt.Errorf("invalid month in the value string: %s", partMonth)}
+	}
+
+	if len(partDay) == 0 || len(partDay) > 2 {
+		return parseResult{error: fmt.Errorf("invalid day in the value string: %s", partDay)}
+	}
+
+	year, err := strconv.Atoi(partYear)
+	if err != nil {
+		return parseResult{error: fmt.Errorf("year value cannot be parsed: %d", year)}
+	}
+
+	month, err := strconv.Atoi(partMonth)
+	if err != nil {
+		return parseResult{error: fmt.Errorf("year value cannot be parsed: %d", month)}
+	}
+
+	day, err := strconv.Atoi(partDay)
+	if err != nil {
+		return parseResult{error: fmt.Errorf("year value cannot be parsed: %d", day)}
+	}
+
+	return parseResult{year: year, month: month, day: day}
 }
 
 func (pd *PersianDate) DayOfWeek() string {
