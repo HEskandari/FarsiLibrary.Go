@@ -1,4 +1,4 @@
-package FarsiLibrary
+package util
 
 import (
 	"strconv"
@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-// JLeap returns one if the specified Persian year is a leap one, otherwise returns zero.
-func JLeap(jyear int) int {
+// jLeap returns one if the specified Persian year is a leap one, otherwise returns zero.
+func jLeap(jyear int) int {
 	// Is jalali year a leap year?
 	_, tmp := divmod(jyear, 33)
 
@@ -18,14 +18,14 @@ func JLeap(jyear int) int {
 	return 0
 }
 
-func IsJLeapDay(jYear int, jMonth int, jDay int) bool {
-	if jDay == 30 && jMonth == 12 && IsJLeapYear(jYear) {
+func isJLeapDay(jYear int, jMonth int, jDay int) bool {
+	if jDay == 30 && jMonth == 12 && isJLeapYear(jYear) {
 		return true
 	}
 	return false
 }
 
-func JLeapYears(jYear int) int {
+func jLeapYears(jYear int) int {
 	var div33 = jYear / 33
 	var cycle = jYear - (div33 * 33)
 	var leap = div33 * 8
@@ -52,28 +52,28 @@ func JLeapYears(jYear int) int {
 	return leap
 }
 
-// IsJLeapYear Checks if a year is a leap one.
-func IsJLeapYear(jyear int) bool {
-	return JLeap(jyear) == 1
+// isJLeapYear Checks if a year is a leap one.
+func isJLeapYear(jyear int) bool {
+	return jLeap(jyear) == 1
 }
 
-// JalaliDays calculates total days of jalali years from the base calendar
-func JalaliDays(jYear int, jMonth int, jDay int) int {
-	var leap = JLeap(jYear)
+// jalaliDays calculates total days of jalali years from the base calendar
+func jalaliDays(jYear int, jMonth int, jDay int) int {
+	var leap = jLeap(jYear)
 	for i := 0; i < jMonth-1; i++ {
 		jDay = jDay + jdayTable[leap][i]
 	}
-	leap = JLeapYears(jYear - 1)
+	leap = jLeapYears(jYear - 1)
 	return (jYear-1)*365 + leap + jDay
 }
 
-// MonthDays returns number of days in a month (non-leap year)
-func MonthDays(monthNo int) int {
+// monthDays returns number of days in a month (non-leap year)
+func monthDays(monthNo int) int {
 	return jdayTable[1][monthNo-1]
 }
 
-// GLeap returns one if the specified Gregorian year is a leap one, otherwise returns zero.
-func GLeap(gyear int) int {
+// gLeap returns one if the specified Gregorian year is a leap one, otherwise returns zero.
+func gLeap(gyear int) int {
 	_, mod4 := divmod(gyear, 4)
 	_, mod100 := divmod(gyear, 100)
 	_, mod400 := divmod(gyear, 400)
@@ -84,12 +84,12 @@ func GLeap(gyear int) int {
 	return 0
 }
 
-// GregDays calculates total days of gregorian days from calendar base
-func GregDays(gYear int, gMonth int, gDay int) int {
+// gregDays calculates total days of gregorian days from calendar base
+func gregDays(gYear int, gMonth int, gDay int) int {
 	var div4 = (gYear - 1) / 4
 	var div100 = (gYear - 1) / 100
 	var div400 = (gYear - 1) / 400
-	var leap = GLeap(gYear)
+	var leap = gLeap(gYear)
 
 	for i := 0; i < gMonth-1; i++ {
 		gDay = gDay + gdayTable[leap][i]
@@ -98,7 +98,7 @@ func GregDays(gYear int, gMonth int, gDay int) int {
 	return ((gYear - 1) * 365) + gDay + div4 - div100 + div400
 }
 
-func LocalizeDigits(v interface{}) string {
+func localizeDigits(v interface{}) string {
 
 	tostring := func() string {
 		switch t := v.(type) {
@@ -121,7 +121,7 @@ func LocalizeDigits(v interface{}) string {
 	return sb.String()
 }
 
-func LocalizeDayOfWeek(t time.Time) string {
+func localizeDayOfWeek(t time.Time) string {
 	weekday := t.Weekday()
 	switch weekday {
 	case time.Saturday:

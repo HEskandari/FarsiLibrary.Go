@@ -1,7 +1,6 @@
-package FarsiLibrary_test
+package util
 
 import (
-	FL "github.com/HEskandari/FarsiLibrary.Go"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -11,7 +10,7 @@ func TestPersianDateConverter_ConvertLeapYears(t *testing.T) {
 
 	// Converts to a leap year in Persian Date (30th Esfand 1387)
 	date := time.Date(2009, 3, 20, 0, 0, 0, 0, time.Local)
-	pd := FL.ToPersianDate(date)
+	pd := ToPersianDate(date)
 
 	if assert.NotNil(t, pd) {
 		assert.Equal(t, 1387, pd.Year())
@@ -24,7 +23,7 @@ func TestPersianDateConverter_ConvertNonLeapYears(t *testing.T) {
 
 	// Converts to a leap year in Persian Date (29th Mehr 1387)
 	date := time.Date(2008, 10, 20, 0, 0, 0, 0, time.Local)
-	pd := FL.ToPersianDate(date)
+	pd := ToPersianDate(date)
 
 	if assert.NotNil(t, pd) {
 		assert.Equal(t, 1387, pd.Year())

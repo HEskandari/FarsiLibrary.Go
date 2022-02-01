@@ -1,4 +1,4 @@
-package FarsiLibrary
+package util
 
 import (
 	"math"
@@ -34,14 +34,14 @@ func ToPersianDate(time time.Time) PersianDate {
 	var i int
 
 	// Calculate total days from the base of gregorian calendar
-	var iTotalDays = GregDays(gyear, int(gmonth), gday)
+	var iTotalDays = gregDays(gyear, int(gmonth), gday)
 	iTotalDays -= yearOffset
 
 	// Calculate total jalali years passed
 	var jyear = int(float64(iTotalDays) / (solar - 0.25/33.0))
 
 	// Calculate passed leap years
-	var leap = JLeapYears(jyear)
+	var leap = jLeapYears(jyear)
 
 	// Calculate total days from the base of jalali calendar
 	var jday = iTotalDays - (365*jyear + leap)
@@ -51,18 +51,18 @@ func ToPersianDate(time time.Time) PersianDate {
 
 	if jday == 0 {
 		jyear--
-		if JLeap(jyear) == 1 {
+		if jLeap(jyear) == 1 {
 			jday = 366
 		} else {
 			jday = 365
 		}
-	} else if jday == 366 && JLeap(jyear) != 1 {
+	} else if jday == 366 && jLeap(jyear) != 1 {
 		jday = 1
 		jyear++
 	}
 
 	// Calculate correct month of jalali calendar
-	leap = JLeap(jyear)
+	leap = jLeap(jyear)
 	for i = 0; i <= 12; i++ {
 		if jday <= jdayTable[leap][i] {
 			break
@@ -75,13 +75,13 @@ func ToPersianDate(time time.Time) PersianDate {
 	return PersianDate{jyear, iJMonth, jday}
 }
 
-func ToGregorianDate(date *PersianDate) time.Time {
+func ToGregorianDate(date PersianDate) time.Time {
 	var jyear = date.Year()
 	var jmonth = date.Month()
 	var jday = date.Day()
 	var i int
 
-	var totalDays = JalaliDays(jyear, jmonth, jday)
+	var totalDays = jalaliDays(jyear, jmonth, jday)
 	totalDays += yearOffset
 
 	var gyear = totalDays / int(math.Floor(solar-0.25/33))
@@ -94,17 +94,17 @@ func ToGregorianDate(date *PersianDate) time.Time {
 
 	if gdays == 0 {
 		gyear--
-		if GLeap(gyear) == 1 {
+		if gLeap(gyear) == 1 {
 			gdays = 366
 		} else {
 			gdays = 365
 		}
-	} else if gdays == 366 && GLeap(gyear) != 1 {
+	} else if gdays == 366 && gLeap(gyear) != 1 {
 		gdays = 1
 		gyear++
 	}
 
-	var leap = GLeap(gyear)
+	var leap = gLeap(gyear)
 	for i = 0; i <= 12; i++ {
 		if gdays <= gdayTable[leap][i] {
 			break

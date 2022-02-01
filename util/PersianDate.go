@@ -1,4 +1,4 @@
-package FarsiLibrary
+package util
 
 import (
 	"fmt"
@@ -27,69 +27,69 @@ type parseResult struct {
 	day   int
 }
 
-func (pd *PersianDate) Year() int {
+func (pd PersianDate) Year() int {
 	return pd.year
 }
 
-func (pd *PersianDate) Month() int {
+func (pd PersianDate) Month() int {
 	return pd.month
 }
 
-func (pd *PersianDate) Day() int {
+func (pd PersianDate) Day() int {
 	return pd.day
 }
 
 // NewPersianDate creates a valid new instance of PersianDate
-func NewPersianDate(year int, month int, day int) (*PersianDate, error) {
+func NewPersianDate(year int, month int, day int) (PersianDate, error) {
 	err := checkYear(year)
 	if err != nil {
-		return nil, err
+		return PersianDate{}, err
 	}
 
 	err = checkMonth(month)
 	if err != nil {
-		return nil, err
+		return PersianDate{}, err
 	}
 
 	err = checkDay(year, month, day)
 	if err != nil {
-		return nil, err
+		return PersianDate{}, err
 	}
 
-	return &PersianDate{year, month, day}, nil
+	return PersianDate{year, month, day}, nil
 }
 
-func Parse(value string) (*PersianDate, error) {
+func Parse(value string) (PersianDate, error) {
 	parseResult := parse(value)
 	if parseResult.error != nil {
-		return nil, parseResult.error
+		return PersianDate{}, parseResult.error
 	}
 
 	return NewPersianDate(parseResult.year, parseResult.month, parseResult.day)
 }
 
-func (pd *PersianDate) Format(layout string) string {
+func (pd PersianDate) Format(layout string) string {
 	generic := func(pd PersianDate) string {
 		return fmt.Sprintf("%s/%s/%s",
-			LocalizeDigits(pd.Year()),
-			LocalizeDigits(fmt.Sprintf("%02d", pd.Month())),
-			LocalizeDigits(fmt.Sprintf("%02d", pd.Day())))
+			localizeDigits(pd.Year()),
+			localizeDigits(fmt.Sprintf("%02d", pd.Month())),
+			localizeDigits(fmt.Sprintf("%02d", pd.Day())))
 	}
 
 	switch layout {
 	case WrittenFormat:
-		return fmt.Sprintf("%s %s %s %s", pd.DayOfWeek(), LocalizeDigits(pd.Day()), pd.MonthName(), LocalizeDigits(pd.Year()))
+		return fmt.Sprintf("%s %s %s %s", pd.DayOfWeek(), localizeDigits(pd.Day()), pd.MonthName(), localizeDigits(pd.Year()))
 	case MonthYearFormat:
-		return fmt.Sprintf("%s %s", pd.MonthName(), LocalizeDigits(pd.Year()))
+		return fmt.Sprintf("%s %s", pd.MonthName(), localizeDigits(pd.Year()))
 	case MonthDayFormat:
-		return fmt.Sprintf("%s %s", LocalizeDigits(pd.Day()), pd.MonthName())
+		return fmt.Sprintf("%s %s", localizeDigits(pd.Day()), pd.MonthName())
 	case GenericShortFormat:
-		return fmt.Sprintf("%s/%s/%s", LocalizeDigits(pd.Year()), LocalizeDigits(pd.Month()), LocalizeDigits(pd.Day()))
+		return fmt.Sprintf("%s/%s/%s", localizeDigits(pd.Year()), localizeDigits(pd.Month()), localizeDigits(pd.Day()))
 	case GenericFormat:
-		return generic(*pd)
+		return generic(pd)
 	}
 
-	return generic(*pd)
+	return generic(pd)
 }
 
 func parse(value string) parseResult {
@@ -136,12 +136,12 @@ func parse(value string) parseResult {
 	return parseResult{year: year, month: month, day: day}
 }
 
-func (pd *PersianDate) DayOfWeek() string {
+func (pd PersianDate) DayOfWeek() string {
 	var dt = ToGregorianDate(pd)
-	return LocalizeDayOfWeek(dt)
+	return localizeDayOfWeek(dt)
 }
 
-func (pd *PersianDate) MonthName() string {
+func (pd PersianDate) MonthName() string {
 	return monthNames[pd.month-1]
 }
 
@@ -169,7 +169,7 @@ func checkDay(year int, month int, day int) error {
 	}
 
 	if month == 12 && day > 29 {
-		if !IsJLeapDay(year, month, day) || day > 30 {
+		if !isJLeapDay(year, month, day) || day > 30 {
 			return fmt.Errorf("%d is an invaluid day value", day)
 		}
 	}
