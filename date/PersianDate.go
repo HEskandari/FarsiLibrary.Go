@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// These are predefined formats to use in PersianDate.Format.
 const (
 	GenericFormat      = "yyyy/mm/dd"
 	GenericShortFormat = "yyyy/m/d"
