@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// These are predefined formats to use in PersianDate.Format.
 const (
 	GenericFormat      = "yyyy/mm/dd"
 	GenericShortFormat = "yyyy/m/d"
@@ -14,6 +15,7 @@ const (
 	WrittenFormat      = "W"
 )
 
+//PersianDate represents the persian date
 type PersianDate struct {
 	year  int
 	month int
@@ -27,14 +29,17 @@ type parseResult struct {
 	day   int
 }
 
+//Year returns the persian date's year value
 func (pd PersianDate) Year() int {
 	return pd.year
 }
 
+//Month returns the persian date's month value
 func (pd PersianDate) Month() int {
 	return pd.month
 }
 
+//Day returns the persian date's day value
 func (pd PersianDate) Day() int {
 	return pd.day
 }
@@ -59,10 +64,12 @@ func NewPersianDate(year int, month int, day int) (PersianDate, error) {
 	return PersianDate{year, month, day}, nil
 }
 
+//Parse parses a string value to a PersianDate instance. Uses the default separate '/'.
 func Parse(value string) (PersianDate, error) {
 	return ParseWithSeparator(value, '/')
 }
 
+//ParseWithSeparator parses a string value to a PersianDate instance with the given separator.
 func ParseWithSeparator(value string, separator rune) (PersianDate, error) {
 	parseResult := parse(value, separator)
 	if parseResult.error != nil {
@@ -72,6 +79,7 @@ func ParseWithSeparator(value string, separator rune) (PersianDate, error) {
 	return NewPersianDate(parseResult.year, parseResult.month, parseResult.day)
 }
 
+//Format formats a PersianDate instance to a string with the given layout.
 func (pd PersianDate) Format(layout string) string {
 	generic := func(pd PersianDate) string {
 		return fmt.Sprintf("%s/%s/%s",
@@ -140,11 +148,13 @@ func parse(value string, separator rune) parseResult {
 	return parseResult{year: year, month: month, day: day}
 }
 
+//DayOfWeek returns the localized day of the week of the PersianDate
 func (pd PersianDate) DayOfWeek() string {
 	var dt = ToGregorianDate(pd)
 	return localizeDayOfWeek(dt)
 }
 
+//MonthName returns the localized month of the PersianDate
 func (pd PersianDate) MonthName() string {
 	return monthNames[pd.month-1]
 }

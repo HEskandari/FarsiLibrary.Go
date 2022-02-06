@@ -75,6 +75,7 @@ func ToPersianDate(time time.Time) PersianDate {
 	return PersianDate{jyear, iJMonth, jday}
 }
 
+//ToGregorianDate converts a PersianDate instance to a time.Time
 func ToGregorianDate(date PersianDate) time.Time {
 	var jyear = date.Year()
 	var jmonth = date.Month()
