@@ -1,4 +1,4 @@
-package util
+package date
 
 import (
 	"fmt"
@@ -60,7 +60,11 @@ func NewPersianDate(year int, month int, day int) (PersianDate, error) {
 }
 
 func Parse(value string) (PersianDate, error) {
-	parseResult := parse(value)
+	return ParseWithSeparator(value, '/')
+}
+
+func ParseWithSeparator(value string, separator rune) (PersianDate, error) {
+	parseResult := parse(value, separator)
 	if parseResult.error != nil {
 		return PersianDate{}, parseResult.error
 	}
@@ -92,12 +96,12 @@ func (pd PersianDate) Format(layout string) string {
 	return generic(pd)
 }
 
-func parse(value string) parseResult {
+func parse(value string, separator rune) parseResult {
 	if len(value) == 0 || len(value) > 10 {
 		return parseResult{error: fmt.Errorf("invalid date string")}
 	}
 
-	parts := strings.Split(value, "/")
+	parts := strings.Split(value, string(separator))
 	if len(parts) != 3 {
 		return parseResult{error: fmt.Errorf("invalid date string")}
 	}

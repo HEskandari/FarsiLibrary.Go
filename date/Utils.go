@@ -1,4 +1,4 @@
-package util
+package date
 
 import (
 	"strconv"
