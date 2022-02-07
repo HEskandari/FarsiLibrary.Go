@@ -1,6 +1,7 @@
 package date_test
 
 import (
+	"encoding/json"
 	"github.com/heskandari/farsilibrary.go/date"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -25,7 +26,9 @@ func TestPersianDate_Format(t *testing.T) {
 		assert.Equal(t, "۳ اردیبهشت", pd.Format(date.MonthDayFormat))
 		assert.Equal(t, "۱۳۸۸/۲/۳", pd.Format(date.GenericShortFormat))
 		assert.Equal(t, "پنجشنبه ۳ اردیبهشت ۱۳۸۸", pd.Format(date.WrittenFormat))
-		assert.Equal(t, "۱۳۸۸/۰۲/۰۳", pd.Format(""))
+		assert.Equal(t, "1388-02-03", pd.Format(date.Serialized))
+		assert.Equal(t, "1388/02/03", pd.Format(""))
+		assert.Equal(t, "1388/02/03", pd.String())
 	}
 }
 
@@ -51,4 +54,48 @@ func TestPersianDate_GetDayOfWeek(t *testing.T) {
 		assert.NotEmpty(t, wd)
 		assert.Equal(t, "یکشنبه", wd)
 	}
+}
+
+func TestPersianDate_Today(t *testing.T) {
+
+	pd := date.Today()
+
+	if assert.NotNil(t, pd) {
+		assert.NotEmpty(t, pd.String())
+		assert.Equal(t, 10, len(pd.String()))
+	}
+}
+
+type Person struct {
+	Name string
+	DoB  *date.PersianDate
+}
+
+func TestPersianDate_JsonMarshalling(t *testing.T) {
+
+	dob, _ := date.NewPersianDate(1400, 01, 01)
+	p := Person{
+		Name: "John",
+		DoB:  &dob,
+	}
+
+	serialized, err := json.Marshal(p)
+
+	assert.NoError(t, err)
+	assert.NotEmpty(t, serialized)
+	assert.JSONEq(t, `{"Name": "John", "DoB": "1400-01-01"}`, string(serialized))
+}
+
+func TestPersianDate_JsonUnMarshalling(t *testing.T) {
+
+	js := `{"Name": "John", "DoB": "1400-02-01"}`
+	var p = Person{}
+
+	err := json.Unmarshal([]byte(js), &p)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, p)
+	assert.Equal(t, p.DoB.Day(), 1)
+	assert.Equal(t, p.DoB.Month(), 2)
+	assert.Equal(t, p.DoB.Year(), 1400)
 }

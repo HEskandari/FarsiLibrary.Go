@@ -32,7 +32,7 @@ func jLeapYears(jYear int) int {
 	var i int
 
 	if cycle > 0 {
-		for i = 1; i <= 18; i = i + 4 {
+		for i = 1; i <= 18; i += 4 {
 			if i > cycle {
 				break
 			}
@@ -41,7 +41,7 @@ func jLeapYears(jYear int) int {
 	}
 
 	if cycle > 21 {
-		for i = 22; i <= 31; i = i + 4 {
+		for i = 22; i <= 31; i += 4 {
 			if i > cycle {
 				break
 			}
@@ -61,14 +61,14 @@ func isJLeapYear(jyear int) bool {
 func jalaliDays(jYear int, jMonth int, jDay int) int {
 	var leap = jLeap(jYear)
 	for i := 0; i < jMonth-1; i++ {
-		jDay = jDay + jdayTable[leap][i]
+		jDay += jdayTable[leap][i]
 	}
 	leap = jLeapYears(jYear - 1)
 	return (jYear-1)*365 + leap + jDay
 }
 
 // monthDays returns number of days in a month (non-leap year)
-func monthDays(monthNo int) int {
+func monthDays(monthNo int) int { //nolint
 	return jdayTable[1][monthNo-1]
 }
 
@@ -92,7 +92,7 @@ func gregDays(gYear int, gMonth int, gDay int) int {
 	var leap = gLeap(gYear)
 
 	for i := 0; i < gMonth-1; i++ {
-		gDay = gDay + gdayTable[leap][i]
+		gDay += gdayTable[leap][i]
 	}
 
 	return ((gYear - 1) * 365) + gDay + div4 - div100 + div400
