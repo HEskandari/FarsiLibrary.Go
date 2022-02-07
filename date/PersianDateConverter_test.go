@@ -32,3 +32,17 @@ func TestPersianDateConverter_ConvertNonLeapYears(t *testing.T) {
 		assert.Equal(t, 7, pd.Month())
 	}
 }
+
+func TestPersianDateConverter_ConvertAndConvertBack(t *testing.T) {
+
+	// Converts to a leap year in Persian Date (29th Mehr 1387)
+	gDate := time.Date(2020, 01, 01, 0, 0, 0, 0, time.Local)
+	pd := date.ToPersianDate(gDate)
+	gd := date.ToGregorianDate(pd)
+
+	if assert.NotNil(t, gd) {
+		assert.Equal(t, 2020, gd.Year())
+		assert.Equal(t, 01, gd.Day())
+		assert.Equal(t, 01, int(gd.Month()))
+	}
+}

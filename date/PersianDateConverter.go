@@ -12,8 +12,8 @@ const (
 
 var gdayTable = [12][12]int{{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}, {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}}
 var jdayTable = [12][12]int{{31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29}, {31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 30}}
-var weekdays = []string{"شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه"}
-var weekdaysabbr = []string{"ش", "ی", "د", "س", "چ", "پ", "ج"}
+var weekdays = []string{"شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه"} //nolint
+var weekdaysabbr = []string{"ش", "ی", "د", "س", "چ", "پ", "ج"}                                //nolint
 var monthNames = []string{"فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"}
 var digits = map[rune]rune{
 	'0': '۰',
@@ -75,7 +75,7 @@ func ToPersianDate(time time.Time) PersianDate {
 	return PersianDate{jyear, iJMonth, jday}
 }
 
-//ToGregorianDate converts a PersianDate instance to a time.Time
+// ToGregorianDate converts a PersianDate instance to a time.Time
 func ToGregorianDate(date PersianDate) time.Time {
 	var jyear = date.Year()
 	var jmonth = date.Month()

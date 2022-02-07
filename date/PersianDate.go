@@ -1,9 +1,11 @@
 package date
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // These are predefined formats to use in PersianDate.Format.
@@ -13,9 +15,10 @@ const (
 	MonthDayFormat     = "MMMM dd"
 	MonthYearFormat    = "MMMM, yyyy"
 	WrittenFormat      = "W"
+	Serialized         = "S"
 )
 
-//PersianDate represents the persian date
+// PersianDate represents the persian date
 type PersianDate struct {
 	year  int
 	month int
@@ -29,17 +32,17 @@ type parseResult struct {
 	day   int
 }
 
-//Year returns the persian date's year value
+// Year returns the persian date's year value
 func (pd PersianDate) Year() int {
 	return pd.year
 }
 
-//Month returns the persian date's month value
+// Month returns the persian date's month value
 func (pd PersianDate) Month() int {
 	return pd.month
 }
 
-//Day returns the persian date's day value
+// Day returns the persian date's day value
 func (pd PersianDate) Day() int {
 	return pd.day
 }
@@ -64,12 +67,12 @@ func NewPersianDate(year int, month int, day int) (PersianDate, error) {
 	return PersianDate{year, month, day}, nil
 }
 
-//Parse parses a string value to a PersianDate instance. Uses the default separate '/'.
+// Parse parses a string value to a PersianDate instance. Uses the default separate '/'.
 func Parse(value string) (PersianDate, error) {
 	return ParseWithSeparator(value, '/')
 }
 
-//ParseWithSeparator parses a string value to a PersianDate instance with the given separator.
+// ParseWithSeparator parses a string value to a PersianDate instance with the given separator.
 func ParseWithSeparator(value string, separator rune) (PersianDate, error) {
 	parseResult := parse(value, separator)
 	if parseResult.error != nil {
@@ -79,15 +82,8 @@ func ParseWithSeparator(value string, separator rune) (PersianDate, error) {
 	return NewPersianDate(parseResult.year, parseResult.month, parseResult.day)
 }
 
-//Format formats a PersianDate instance to a string with the given layout.
+// Format formats a PersianDate instance to a string with the given layout.
 func (pd PersianDate) Format(layout string) string {
-	generic := func(pd PersianDate) string {
-		return fmt.Sprintf("%s/%s/%s",
-			localizeDigits(pd.Year()),
-			localizeDigits(fmt.Sprintf("%02d", pd.Month())),
-			localizeDigits(fmt.Sprintf("%02d", pd.Day())))
-	}
-
 	switch layout {
 	case WrittenFormat:
 		return fmt.Sprintf("%s %s %s %s", pd.DayOfWeek(), localizeDigits(pd.Day()), pd.MonthName(), localizeDigits(pd.Year()))
@@ -98,10 +94,21 @@ func (pd PersianDate) Format(layout string) string {
 	case GenericShortFormat:
 		return fmt.Sprintf("%s/%s/%s", localizeDigits(pd.Year()), localizeDigits(pd.Month()), localizeDigits(pd.Day()))
 	case GenericFormat:
-		return generic(pd)
+		return fmt.Sprintf("%s/%s/%s",
+			localizeDigits(pd.Year()),
+			localizeDigits(fmt.Sprintf("%02d", pd.Month())),
+			localizeDigits(fmt.Sprintf("%02d", pd.Day())))
+	case Serialized:
+		return fmt.Sprintf("%d-%s-%s",
+			pd.Year(),
+			fmt.Sprintf("%02d", pd.Month()),
+			fmt.Sprintf("%02d", pd.Day()))
 	}
 
-	return generic(pd)
+	return fmt.Sprintf("%d/%s/%s",
+		pd.Year(),
+		fmt.Sprintf("%02d", pd.Month()),
+		fmt.Sprintf("%02d", pd.Day()))
 }
 
 func parse(value string, separator rune) parseResult {
@@ -148,15 +155,47 @@ func parse(value string, separator rune) parseResult {
 	return parseResult{year: year, month: month, day: day}
 }
 
-//DayOfWeek returns the localized day of the week of the PersianDate
+// DayOfWeek returns the localized day of the week of the PersianDate
 func (pd PersianDate) DayOfWeek() string {
 	var dt = ToGregorianDate(pd)
 	return localizeDayOfWeek(dt)
 }
 
-//MonthName returns the localized month of the PersianDate
+// MonthName returns the localized month of the PersianDate
 func (pd PersianDate) MonthName() string {
 	return monthNames[pd.month-1]
+}
+
+// Today returns current time as PersianDate
+func Today() PersianDate {
+	return ToPersianDate(time.Now())
+}
+
+func (pd *PersianDate) String() string {
+	return pd.Format("")
+}
+
+func (pd *PersianDate) MarshalJSON() ([]byte, error) {
+	return json.Marshal(pd.Format(Serialized))
+}
+
+func (pd *PersianDate) UnmarshalJSON(bytes []byte) error {
+	var deserialized string
+
+	if err := json.Unmarshal(bytes, &deserialized); err != nil {
+		return err
+	}
+
+	parsed, err := ParseWithSeparator(deserialized, '-')
+	if err != nil {
+		return err
+	}
+
+	pd.day = parsed.day
+	pd.month = parsed.month
+	pd.year = parsed.year
+
+	return nil
 }
 
 func checkYear(year int) error {
